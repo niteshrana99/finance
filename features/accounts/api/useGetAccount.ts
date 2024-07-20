@@ -5,6 +5,7 @@ export const useGetAccount = (id: number) => {
     const query = useQuery({
         enabled: !!id,
         queryKey: ['account', { id }],
+        staleTime: 0,
         queryFn: async () => {
             const response = await client.api.accounts[':id'].$get({
                 param: {

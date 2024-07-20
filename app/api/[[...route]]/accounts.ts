@@ -84,4 +84,62 @@ const app = new Hono()
     });
     return c.json({ data });
   })
+  .post('')
+  .patch('edit/:id',
+    clerkMiddleware(),
+    zValidator('param', z.object({ id: z.string().optional() })),
+    zValidator('json', schema),
+    async (c) => {
+      const auth = getAuth(c);
+
+      if (!auth?.userId) {
+        return c.json({ message: 'Unauthorized' }, 401);
+      }
+
+      const { id } = c.req.valid('param');
+      const values = c.req.valid('json');
+
+      if (!id) {
+        return c.json({ error: 'Not Found' }, 400);
+      };
+
+      const response = await prisma.accounts.update({
+        where: {
+          userId: auth.userId,
+          id: Number(id)
+        },
+        data: {
+          name: values.name
+        }
+      });
+
+      return c.json({ response });
+
+    })
+  .delete('delete/:id',
+    clerkMiddleware(),
+    zValidator('param', z.object({ id: z.string().optional() })),
+    async (c) => {
+      const auth = getAuth(c);
+
+      if (!auth?.userId) {
+        return c.json({ message: 'Unauthorized' }, 401);
+      }
+
+      const { id } = c.req.valid('param');
+
+      if (!id) {
+        return c.json({ error: 'Not Found' }, 400);
+      };
+
+      const response = await prisma.accounts.delete({
+        where: {
+          userId: auth.userId,
+          id: Number(id)
+        }
+      });
+
+      return c.json({ response });
+
+    });
 export default app;

@@ -11,14 +11,35 @@ import { AccountForm } from "./accountForm";
 import { useGetAccount } from "../api/useGetAccount";
 import { Loader2 } from "lucide-react";
 import useEditAccount from "../hooks/useEditAccount";
+import useModifyAccount from "../api/useModifyAccount";
+import useDeleteSingleAccount from "../api/useDeleteSingleAccount";
 
 const EditAccountSheet = () => {
   const { isOpen, closeSheet, id } = useEditAccount();
 
   const { isLoading, data } = useGetAccount(id);
 
-  const submitFnHandler= (values: { name: string }) => {
+  const mutation = useModifyAccount({ id: id.toString() });
+  const { isPending } = mutation;
 
+  const deleteMutation = useDeleteSingleAccount();
+
+  const { isPending: isDeletePending } = deleteMutation;
+
+  const submitFnHandler= (values: { name: string }) => {
+    mutation.mutate(values, {
+        onSuccess: () => {
+            closeSheet();
+        }
+    })
+  }
+
+  const onDeleteHandler = () => {
+    deleteMutation.mutate({ param: { id: id.toString() } }, {
+        onSuccess: () => {
+            closeSheet();
+        }
+    })
   }
 
   return (
@@ -27,10 +48,10 @@ const EditAccountSheet = () => {
         <SheetHeader>
           <SheetTitle>Edit Account</SheetTitle>
           <SheetDescription>
-            Edit your account to easily track your transactions.
+            Edit to track your transactions.
           </SheetDescription>
         </SheetHeader>
-        {id && isLoading ? <Loader2 /> : <AccountForm disabled={false} submit={submitFnHandler} defaultValues={{
+        {id && isLoading ? <Loader2 /> : <AccountForm onDelete={onDeleteHandler} isEditMode={true} disabled={isPending || isDeletePending} submit={submitFnHandler} defaultValues={{
           name: data?.name || ''
         }} /> }
       </SheetContent>

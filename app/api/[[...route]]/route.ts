@@ -9,9 +9,11 @@ import { HTTPException } from 'hono/http-exception'
 const app = new Hono().basePath('/api')
 
 const routes = app
-            .route('/accounts', accounts)
+    .route('/accounts', accounts)
 
 export const GET = handle(app);
 export const POST = handle(app);
+export const PATCH = handle(app);
+export const DELETE = handle(app);
 
 export type AppType = typeof routes;
