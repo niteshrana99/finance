@@ -8,8 +8,8 @@ type State = {
 
 const useOpenNewAccount = create<State>((set) => ({
     isOpen: false,
-    openSheet: () => set(() => ({isOpen : true})),
-    closeSheet: () => set(() => ({isOpen : false}))
+    openSheet: () => set(() => ({ isOpen: true })),
+    closeSheet: () => set(() => ({ isOpen: false }))
 }))
 
 export default useOpenNewAccount;

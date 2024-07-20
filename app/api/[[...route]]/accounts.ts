@@ -30,6 +30,30 @@ const app = new Hono()
       accounts
     });
   })
+  .get('/:id', clerkMiddleware(), zValidator('param', z.object({ id: z.string().optional() })), async (c) => {
+    const auth = getAuth(c);
+    if (!auth?.userId) {
+      return c.json({ message: 'Unauthorized' }, 401);
+    };
+    const { id } = c.req.valid('param');
+    if (!id) {
+      return c.json({ error: 'Bad Request!! Missing Id' }, 400);
+    }
+    const data = await prisma.accounts.findUnique({
+      where: {
+        userId: auth?.userId,
+        id: Number(id)
+      },
+      select: {
+        name: true,
+        id: true,
+      }
+    });
+    if (!data) {
+      return c.json({ error: 'Not Found' }, 400);
+    }
+    return c.json({ account: data }, 200);
+  })
   .post('/', clerkMiddleware(), zValidator('json', schema), async (c) => {
     const auth = getAuth(c);
     const values = c.req.valid('json');

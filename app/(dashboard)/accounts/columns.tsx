@@ -6,6 +6,7 @@ import { ArrowUpDown } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox"
 import { InferResponseType } from "hono";
 import { client } from "@/lib/hono";
+import Action from "./actions";
 
 type ResponseType = InferResponseType<typeof client.api.accounts.$get, 200>["accounts"][0]
 export const columns: ColumnDef<ResponseType>[] = [
@@ -45,4 +46,8 @@ export const columns: ColumnDef<ResponseType>[] = [
         )
       },
   },
+  {
+    id: "action",
+    cell: ({row}) => <Action id={row.original.id} />
+  }
 ]
