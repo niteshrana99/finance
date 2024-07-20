@@ -34,7 +34,7 @@ const AccountsPage = () => {
             const ids = rows.map(r => r.original.id);
             mutate({ids});
           }} 
-          filterKey="email" 
+          filterKey="name" 
           columns={columns} 
           data={data || []}
           disabled={disabled} />

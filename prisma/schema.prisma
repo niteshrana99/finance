@@ -14,7 +14,14 @@ datasource db {
 }
 
 model Accounts {
-  id Int @id @default(autoincrement())
-  name String
+  id     Int    @id @default(autoincrement())
+  name   String
   userId String
+}
+
+model Categories {
+  id      Int    @id @default(autoincrement())
+  plaidId String
+  name    String
+  userId  String
 }
