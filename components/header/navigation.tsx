@@ -28,7 +28,7 @@ const routes: Array<RouteObj> = [
     label: "Accounts",
   },
   {
-    href: "/catergories",
+    href: "/categories",
     label: "Categories",
   },
   {
