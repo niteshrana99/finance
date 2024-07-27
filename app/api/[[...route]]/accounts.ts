@@ -65,6 +65,10 @@ const app = new Hono()
       data: {
         name: values.name,
         userId: auth.userId,
+      },
+      select: {
+        id: true,
+        name: true,
       }
     });
     return c.json({ data });
@@ -84,7 +88,6 @@ const app = new Hono()
     });
     return c.json({ data });
   })
-  .post('')
   .patch('edit/:id',
     clerkMiddleware(),
     zValidator('param', z.object({ id: z.string().optional() })),

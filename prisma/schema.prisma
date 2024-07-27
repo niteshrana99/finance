@@ -5,7 +5,8 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["relationJoins"]
 }
 
 datasource db {
@@ -18,6 +19,8 @@ model Accounts {
   plaidId String?
   name    String
   userId  String
+
+  Transactions Transactions[]
 }
 
 model Categories {
@@ -25,4 +28,18 @@ model Categories {
   plaidId String?
   name    String
   userId  String
+
+  Transactions Transactions[]
+}
+
+model Transactions {
+  id         Int         @id @default(autoincrement())
+  amount     Int
+  payee      String
+  notes      String
+  date       DateTime    @default(now())
+  account    Accounts    @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  category   Categories? @relation(fields: [categoryId], references: [id])
+  categoryId Int?
+  accountId  Int
 }
