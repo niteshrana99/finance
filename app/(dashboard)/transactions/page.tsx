@@ -10,7 +10,7 @@ import { Row } from '@tanstack/react-table';
 import useOpenNewCategory from '@/features/categories/hooks/useOpenNewCategory';
 import { useGetCategories } from '@/features/categories/api/useGetCategories';
 import useDeleteCategories from '@/features/categories/api/useDeleteCategories';
-import useNewTransaction from '@/features/trnsactions/hooks/use-new-transaction';
+import useNewTransaction from '@/features/transactions/hooks/use-new-transaction';
 
 const TrnsactionsPage = () => {
   const { openSheet } = useNewTransaction();
