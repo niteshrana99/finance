@@ -5,7 +5,6 @@ import {
   SheetTitle,
   SheetDescription
 } from '@/components/ui/sheet';
-import useNewTransaction from '../hooks/use-new-transaction';
 import TransactionForm from './transactionForm';
 import { useGetAccounts } from '@/features/accounts/api/useGetAccounts';
 import { useGetCategories } from '@/features/categories/api/useGetCategories';
@@ -15,6 +14,11 @@ import useCreateCategory from '@/features/categories/api/useCreateCategory';
 import { toast } from 'sonner';
 import useCreateNewTransaction from '../api/useCreateNewTransaction';
 import { z } from 'zod';
+import useEditTransaction from '@/features/categories/hooks/useEditTransaction';
+import useGetTransactionById from '../api/useGetTransactionById';
+import useEditTransactionData from '../api/useEditTransactionData';
+import useConfirmModal from '@/hooks/useConfirmModal';
+import useDeleteTransactionById from '../api/useDeleteTransactionById';
 
 const SelectDropdownSchema = z.object({
   label: z.string(),
@@ -30,9 +34,17 @@ const schema = z.object({
   notes: z.string().optional()
 });
 
-const NewTransactionSheet = () => {
-  const { isOpen, closeSheet } = useNewTransaction();
+const EditTransactionSheet = () => {
+  const { isOpen, closeSheet, id } = useEditTransaction();
   const { data: accountsData, isLoading: isAccountsLoading } = useGetAccounts();
+  const [ConfirmDialog, confirm] = useConfirmModal({
+    title: 'Are you absolutely sure?',
+    description:
+      'This action cannot be undone. This will permanently delete your category and remove your data from our servers.'
+  });
+
+  const { data: transaction, isLoading: isTransactionLoading } = useGetTransactionById(id);
+  console.log(transaction);
 
   const accountsOption = accountsData?.map((category) => ({
     label: category.name,
@@ -48,10 +60,11 @@ const NewTransactionSheet = () => {
 
   const accountMutation = useCreateAccount();
   const categoryMutation = useCreateCategory();
-  const createTransactionMutation = useCreateNewTransaction();
+  const transactionMutation = useEditTransactionData(id);
+  const deleteTransactionMutation = useDeleteTransactionById();
 
-  const createTransactionCTA = (value: z.infer<typeof schema>) => {
-    createTransactionMutation.mutate(value, {
+  const updateTransactionCTA = (value: z.infer<typeof schema>) => {
+    transactionMutation.mutate(value, {
       onSuccess: () => {
         closeSheet();
       },
@@ -62,7 +75,10 @@ const NewTransactionSheet = () => {
   };
 
   const disabled =
-    accountMutation.isPending || categoryMutation.isPending || createTransactionMutation.isPending;
+    accountMutation.isPending ||
+    categoryMutation.isPending ||
+    transactionMutation.isPending ||
+    deleteTransactionMutation.isPending;
 
   const createNewAccount = (accountName: string) => {
     accountMutation.mutate(
@@ -87,14 +103,22 @@ const NewTransactionSheet = () => {
     );
   };
 
+  const onDeleteTransactionCTA = async () => {
+      deleteTransactionMutation.mutate({ param: { id: id.toString() } }, {
+        onSuccess: () => {
+          closeSheet();
+        }
+      });
+  };
+
   return (
     <Sheet open={isOpen} onOpenChange={closeSheet}>
       <SheetContent className="space-y-4">
         <SheetHeader>
-          <SheetTitle>New Transaction</SheetTitle>
-          <SheetDescription>Create a new Transaction.</SheetDescription>
+          <SheetTitle>Edit Transaction</SheetTitle>
+          <SheetDescription>Edit an existeing transaction.</SheetDescription>
         </SheetHeader>
-        {isAccountsLoading || isCategoriesLoading ? (
+        {isAccountsLoading || isCategoriesLoading || isTransactionLoading ? (
           <Loader2 />
         ) : (
           <TransactionForm
@@ -103,7 +127,10 @@ const NewTransactionSheet = () => {
             onCrateNewAccount={createNewAccount}
             onCreateNewCategory={createNewCategory}
             disabled={disabled}
-            createTransaction={createTransactionCTA}
+            createTransaction={updateTransactionCTA}
+            isEditMode={true}
+            transaction={transaction}
+            onDelete={onDeleteTransactionCTA}
           />
         )}
       </SheetContent>
@@ -111,4 +138,4 @@ const NewTransactionSheet = () => {
   );
 };
 
-export default NewTransactionSheet;
+export default EditTransactionSheet;

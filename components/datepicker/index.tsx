@@ -8,6 +8,13 @@ import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 
 const DatePicker = ({ value, onChange, disabled } : any) => {
 
+  console.log(value)
+
+    const onDateSelect = (value: any) => {
+      onChange(format(value, 'yyyy-MM-dd'));
+    }
+
+
     return <Popover>
     <PopoverTrigger asChild>
       <Button
@@ -18,14 +25,14 @@ const DatePicker = ({ value, onChange, disabled } : any) => {
         variant='ghost'
       >
         <CalendarIcon className="mr-2 h-4 w-4" />
-        {value ? format(value, "PPP") : <div>Pick a date</div>}
+        {value ? format(value, 'yyyy-MM-dd') : <div>Pick a date</div>}
       </Button>
     </PopoverTrigger>
     <PopoverContent className="w-auto p-0">
       <Calendar
         mode="single"
         selected={value}
-        onSelect={onChange}
+        onSelect={onDateSelect}
         initialFocus
         disabled={disabled}
       />

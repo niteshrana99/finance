@@ -6,16 +6,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Plus } from 'lucide-react';
 import { columns } from './columns';
 import { SkeletonCard } from '@/components/skeletonCard';
-import { Row } from '@tanstack/react-table';
-import useOpenNewCategory from '@/features/categories/hooks/useOpenNewCategory';
-import { useGetCategories } from '@/features/categories/api/useGetCategories';
-import useDeleteCategories from '@/features/categories/api/useDeleteCategories';
 import useNewTransaction from '@/features/transactions/hooks/use-new-transaction';
+import useGetTransactions from '@/features/transactions/api/useGetTransactions';
+import useBulkDeleteTransactions from '@/features/transactions/api/useBulkDeleteTransactions';
 
 const TrnsactionsPage = () => {
   const { openSheet } = useNewTransaction();
-  const { data, isLoading } = useGetCategories();
-  const { mutate, isPending } = useDeleteCategories();
+  const { data, isLoading } = useGetTransactions();
+  const { mutate, isPending } = useBulkDeleteTransactions();
   const disabled = isLoading || isPending;
 
   return (
@@ -33,9 +31,9 @@ const TrnsactionsPage = () => {
           <DataTable 
           onDelete={(rows) => {
             const ids = rows.map(r => r.original.id);
-            mutate({ids});
+            mutate({json: {ids}});
           }} 
-          filterKey="name" 
+          filterKey="payee" 
           columns={columns} 
           data={data || []}
           disabled={disabled} />

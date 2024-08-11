@@ -8,6 +8,9 @@ import DatePicker from '@/components/datepicker';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import AmountInput from '@/components/amountInput';
+import { Trash } from 'lucide-react';
+import { Transaction } from './types';
+import { format } from 'date-fns';
 
 const SelectDropdownSchema = z.object({
   label: z.string(),
@@ -17,7 +20,7 @@ const SelectDropdownSchema = z.object({
 const schema = z.object({
   category: SelectDropdownSchema,
   account: SelectDropdownSchema,
-  date: z.date(),
+  date: z.string().date(),
   payee: z.string(),
   amount: z.string(),
   notes: z.string().optional()
@@ -28,7 +31,11 @@ interface ITransactionForm {
   categories: z.infer<typeof SelectDropdownSchema>[] | [];
   onCrateNewAccount: (value: string) => void;
   onCreateNewCategory: (value: string) => void;
+  createTransaction: (value: z.infer<typeof schema>) => void;
+  onDelete?: () => void;
   disabled: boolean;
+  isEditMode?: boolean;
+  transaction?: Transaction | undefined | null;
 }
 
 const TransactionForm = ({
@@ -36,20 +43,29 @@ const TransactionForm = ({
   categories,
   onCrateNewAccount,
   onCreateNewCategory,
-  disabled
+  createTransaction,
+  disabled,
+  isEditMode,
+  transaction,
+  onDelete
 }: ITransactionForm) => {
-  const form = useForm({
-    resolver: zodResolver(schema)
+  const form = useForm<z.infer<typeof schema>>({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      category: transaction ? { label: transaction?.category.name, value: transaction?.category.id } : undefined,
+      account: transaction ? { label: transaction?.account.name, value: transaction?.account.id } : undefined,
+      date: transaction ? format(transaction?.date, 'yyyy-MM-dd') : undefined,
+      amount: transaction ? transaction?.amount : undefined,
+      notes: transaction ? transaction?.notes || null || undefined : undefined,
+      payee: transaction ? transaction?.payee : undefined,
+    }
   });
 
   const { control, handleSubmit } = form;
 
-  const createTransactionCTA = (value: any) => {
-    console.log(value);
-  };
-
-  const onSubmit = handleSubmit(createTransactionCTA, (errors) => {
+  const onSubmit = handleSubmit(createTransaction, (errors, event) => {
     console.log('Form errors:', errors);
+    console.log(event)
   });
 
   return (
@@ -150,9 +166,12 @@ const TransactionForm = ({
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full mt-12 space-y-4" disabled={disabled}>
-          Create Transaction
+        <Button disabled={disabled} className="w-full mt-12 space-y-4">
+          {isEditMode ? 'Update Transaction' : 'Create Transaction'}
         </Button>
+        {isEditMode && <Button type="button" variant="ghost" onClick={() => onDelete?.()} disabled={disabled} className="w-full mt-12 space-y-4">
+          <Trash className="mr-2 size-4" /> Delete Transaction
+        </Button>}
       </form>
     </Form>
   );

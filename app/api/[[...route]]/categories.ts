@@ -84,7 +84,6 @@ const app = new Hono()
         });
         return c.json({ data });
     })
-    .post('')
     .patch('edit/:id',
         clerkMiddleware(),
         zValidator('param', z.object({ id: z.string().optional() })),
