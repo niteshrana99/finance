@@ -18,7 +18,7 @@ const SelectDropdownSchema = z.object({
 });
 
 const schema = z.object({
-  category: SelectDropdownSchema,
+  category: SelectDropdownSchema.optional(),
   account: SelectDropdownSchema,
   date: z.string().date(),
   payee: z.string(),
@@ -52,7 +52,7 @@ const TransactionForm = ({
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: {
-      category: transaction ? { label: transaction?.category.name, value: transaction?.category.id } : undefined,
+      category: transaction?.category ? { label: transaction?.category.name, value: transaction?.category.id } : undefined,
       account: transaction ? { label: transaction?.account.name, value: transaction?.account.id } : undefined,
       date: transaction ? format(transaction?.date, 'yyyy-MM-dd') : undefined,
       amount: transaction ? transaction?.amount : undefined,

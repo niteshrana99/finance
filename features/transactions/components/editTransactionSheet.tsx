@@ -26,7 +26,7 @@ const SelectDropdownSchema = z.object({
 });
 
 const schema = z.object({
-  category: SelectDropdownSchema,
+  category: SelectDropdownSchema.optional(),
   account: SelectDropdownSchema,
   date: z.string().date(),
   payee: z.string(),
@@ -44,7 +44,6 @@ const EditTransactionSheet = () => {
   });
 
   const { data: transaction, isLoading: isTransactionLoading } = useGetTransactionById(id);
-  console.log(transaction);
 
   const accountsOption = accountsData?.map((category) => ({
     label: category.name,

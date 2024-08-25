@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown } from "lucide-react";
+import { ArrowUpDown, TriangleAlert } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox"
 import { InferResponseType } from "hono";
 import { client } from "@/lib/hono";
@@ -74,7 +74,7 @@ export const columns: ColumnDef<ResponseType>[] = [
     cell: ({ row }) => {
       return (
         <span>
-          {row.original.category.name}
+          {row.original.category?.name || <div className="flex items-center gap-1"><TriangleAlert color="red" className="size-4" /> Uncategorized</div>}
         </span>
       )
     }

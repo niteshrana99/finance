@@ -15,11 +15,22 @@ const objectSchema = z.object({
 const schema = z.object({
     date: z.string().date(),
     account: objectSchema,
-    category: objectSchema,
+    category: objectSchema.optional(),
     payee: z.string(),
     amount: z.string(),
     notes: z.string().optional()
 });
+
+
+const bulkTransactionSchema = z.object({
+    account: objectSchema,
+    transactions: z.array(z.object({
+        date: z.string().date(),
+        payee: z.string(),
+        amount: z.string(),
+        notes: z.string().optional(),
+    }))
+})
 
 const app = new Hono()
     .post('/createTransaction', clerkMiddleware(), zValidator('json', schema), async (c) => {
@@ -37,7 +48,7 @@ const app = new Hono()
                     connect: { id: json.account.value }
                 },
                 category: {
-                    connect: json.account.value ? { id: json.category.value } : undefined
+                    connect: json?.category ? { id: json.category.value } : undefined
                 },
                 date: new Date(json.date)
             }
@@ -160,7 +171,7 @@ const app = new Hono()
                         connect: { id: json.account.value }
                     },
                     category: {
-                        connect: { id: json.category.value }
+                        connect: json.category ? { id: json.category.value } : undefined
                     },
                     date: new Date(json.date)
                 },
@@ -229,6 +240,40 @@ const app = new Hono()
             })
 
             return c.json({ transaction }, 200)
+        }
+    )
+    .post(
+        'bulk-create',
+        clerkMiddleware(),
+        zValidator("json", bulkTransactionSchema),
+        async (c) => {
+            const auth = getAuth(c);
+            if (!auth?.userId) {
+                return c.json({ message: 'Unauthorized' }, 401);
+            }
+
+            const json = c.req.valid('json');
+            const { account, transactions } = json;
+            const isValidAccount = await prisma.accounts.findFirst({
+                where: {
+                    id: account.value,
+                    userId: auth.userId
+                }
+            });
+
+            if (!isValidAccount) {
+                return c.json({ message: 'Invalid account or unauthorized access' }, 403);
+            };
+
+            const createdTransactions = await prisma.transactions.createMany({
+                data: transactions.map((transaction: any) => ({
+                    ...transaction,
+                    accountId: account.value,
+                    date: new Date(transaction.date)
+                }))
+            });
+            return c.json({ count: createdTransactions.count }, 200)
+
         }
     );
 

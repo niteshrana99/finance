@@ -12,10 +12,10 @@ export interface Transaction {
         name: string;
         userId: string;
     };
-    category: {
+    category?: {
         id: number;
         plaidId: null | string;
         name: string;
         userId: string;
-    };
+    } | null;
 }
