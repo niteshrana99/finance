@@ -52,7 +52,7 @@ const DataGrid = () => {
 export function SkeletonCard() {
   return (
     <div className="flex flex-row justify-between">
-      {[1, 2, 3].map(() => <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8 pb-2">
+      {[1, 2, 3].map((d) => <div key={d} className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8 pb-2">
       <Skeleton className="h-[200px] w-[490px] rounded-xl" />
       </div>
       )}

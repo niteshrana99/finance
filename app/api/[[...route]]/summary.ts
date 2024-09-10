@@ -116,7 +116,7 @@ const app = new Hono()
         const expensesChange = calculatePercentageChange(Number(currentPeriod[0].expenses), Number(lastPeriod[0].expenses)).toFixed(2);
         const remainingChange = calculatePercentageChange(Number(currentPeriod[0].remaining), Number(lastPeriod[0].remaining)).toFixed(2);
 
-        const categories: Array<{ name: string, total: string }> = await prisma.$queryRaw`
+        const categories: Array<{ name: string, total: number }> = await prisma.$queryRaw`
             SELECT c."name", CAST(SUM(ABS(CAST(t.amount as DECIMAL))) as FLOAT) AS total 
             FROM "Categories" c
             INNER JOIN "Transactions" t on c.id = t."categoryId"
@@ -133,12 +133,12 @@ const app = new Hono()
 
         if (otherCategories.length) {
             const otherTotal = otherCategories.reduce((acc, next) => {
-                return acc + parseFloat(next.total)
+                return acc + next.total
             }, 0);
 
             topCategories.push({
                 name: "Others",
-                total: otherTotal.toString()
+                total: otherTotal
             })
         }
 
@@ -146,7 +146,7 @@ const app = new Hono()
             SELECT
                 t.date,
                 SUM(CASE WHEN CAST(t.amount as DECIMAL) >= 0 THEN CAST(t.amount as DECIMAL) ELSE 0 END) AS income,
-                SUM(CASE WHEN CAST(t.amount as DECIMAL) < 0 THEN CAST(t.amount as DECIMAL) ELSE 0 END) AS expenses
+                ABS(SUM(CASE WHEN CAST(t.amount as DECIMAL) < 0 THEN CAST(t.amount as DECIMAL) ELSE 0 END))AS expenses
             FROM "Transactions" t
             INNER JOIN "Accounts" a on a.id = t."accountId"
             WHERE a."userId" = ${auth.userId}
