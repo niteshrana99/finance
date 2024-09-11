@@ -50,7 +50,7 @@ const NewTransactionSheet = () => {
   const categoryMutation = useCreateCategory();
   const createTransactionMutation = useCreateNewTransaction();
 
-  const createTransactionCTA = (value: z.infer<typeof schema>) => {
+  const createTransactionCTA = (value: any) => {
     createTransactionMutation.mutate(value, {
       onSuccess: () => {
         closeSheet();
