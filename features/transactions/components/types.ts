@@ -4,7 +4,7 @@ export interface Transaction {
     payee: string;
     notes: null | string;
     date: string;
-    categoryId: number;
+    categoryId: number | null;
     accountId: number;
     account: {
         id: number;
