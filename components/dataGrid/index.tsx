@@ -33,7 +33,7 @@ const DataGrid = () => {
         value={data?.incomeAmount}
         percentageChange={data?.incomesChange}
         icon={FaArrowTrendUp}
-        variant="default"
+        variant="success"
         dateRange={dateRangeLabel}
       />
       <DataCard
@@ -41,7 +41,7 @@ const DataGrid = () => {
         value={data?.expensesAmount}
         percentageChange={data?.expensesChange}
         icon={FaArrowTrendDown}
-        variant="default"
+        variant="danger"
         dateRange={dateRangeLabel}
       />
     </div>
