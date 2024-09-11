@@ -30,8 +30,8 @@ const ImportTable = ({ headers, body, onTableHeaderChange, selectedColumns }: II
       <TableBody>
         {body.map((item: string[], index: number) => (
           <TableRow key={index}>
-            {item.map((columnValue: string) => (
-              <TableCell>{columnValue}</TableCell>
+            {item.map((columnValue: string, rowNumber: number) => (
+              <TableCell key={rowNumber}>{columnValue}</TableCell>
             ))}
           </TableRow>
         ))}
